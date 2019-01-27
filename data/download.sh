@@ -17,7 +17,8 @@ done < protein_species.dat
 DNADIR=dnadb
 mkdir -p $DNADIR
 
-while read SPECIES
+IFS=,
+while read SPECIES TAXONOMY
 do
 	DNAFILE="FungiDB-${RELEASE}_${SPECIES}_Genome.fasta"
 	OUTDNA=$DNADIR/${SPECIES}.dna.fasta

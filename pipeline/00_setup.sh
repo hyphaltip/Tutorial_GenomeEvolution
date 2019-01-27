@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 # setup some folders
-mkdir -p analysis logs
+mkdir -p analysis logs plots
 
 pushd data
 bash download.sh
