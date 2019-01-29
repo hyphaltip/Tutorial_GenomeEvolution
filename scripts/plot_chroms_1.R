@@ -59,14 +59,15 @@ drawGeneSummaryFunc <- function(pref) {
 
   ChromTxs = transcripts(txdb)
   #gsub("_A_fumigatus\\S+","",seqnames(ChromTxs)),
+  
   d = data.frame(start = start(ChromTxs), 
-                       end    = end(ChromTxs),
-                       chr    = seqnames(ChromTxs),
-                       strand = strand(ChromTxs),
-                       txname =  ChromTxs$tx_name,
-                       txid   =  ChromTxs$tx_id,
-                       introncount = as.numeric(intronct),
-                      length = as.numeric(width(ranges(ChromTxs)))
+                 end    = end(ChromTxs),
+                 chr    = seqnames(ChromTxs),
+                 strand = strand(ChromTxs),
+                 txname =  ChromTxs$tx_name,
+                 txid   =  ChromTxs$tx_id,
+                 introncount = as.numeric(intronct),
+                 length = as.numeric(width(ranges(ChromTxs)))
   )
   d <- d[order(d$chr, d$start), ]
 
@@ -78,14 +79,22 @@ drawGeneSummaryFunc <- function(pref) {
   d$index = rep.int(seq_along(unique(d$chr)), times = tapply(d$start,d$chr,length))
 
   d$pos=NA
-  nchr = length(levels(d$chr))
+  
   lastbase=0
   ticks = NULL
   minor = vector(,8)
+  chrlens = do.call(rbind,sapply(sort(unique(d$chr)),function(i) data.frame(name=i,len=max(subset(d$end,d$chr == i))),
+                   simplify=FALSE, USE.NAMES=TRUE))
+  topten = head(chrlens[order(-chrlens$len),],10)
+  biggest_chroms = factor(topten$name)
+  d = d[d$chr %in%  biggest_chroms, ]
+  d$chr = factor(d$chr)
+  nchr = length(levels(d$chr))
   for (i in 1:nchr ) {
     if (i ==1) {
       d[d$index==i, ]$pos = d[d$index==i, ]$start
     } else {
+      
       ## chromosome position maybe not start at 1, eg. 9999. So gaps may be produced.
       lastbase = lastbase + max(d[d$index==(i-1),"start"])
       minor[i] = lastbase
@@ -97,13 +106,14 @@ drawGeneSummaryFunc <- function(pref) {
   }
   ticks <-tapply(d$pos,d$index,quantile,probs=0.5)
   minorB <- tapply(d$end,d$index,max,probs=0.5)
+  
   p <- ggplot(d,aes(x=d$pos,y=d$length, color=chr))+geom_point(alpha=0.8,size=1,shape=16) + 
       scale_color_brewer(palette="Set2",type="seq") + scale_x_continuous(name="Chromosome", expand = c(0, 0),
                                                                          breaks = ticks,
                                                                          labels=(unique(d$chr))) +
       guides(fill = guide_legend(keywidth = 3, keyheight = 1))
-    p + labs(title=sprintf("%s Gene Length distribution",pref)) + ylab("Gene Length") + theme_minimal()
-  p
+    p + ggtitle(sprintf("%s Gene Length distribution",pref)) + ylab("Gene Length") + theme_minimal()
+  print(p)
 
   p <- ggplot(d,aes(x=d$pos,y=d$introncount, color=chr))+geom_line(alpha=0.7,size=1) + 
     scale_color_brewer(palette="Set2",type="seq") + scale_x_continuous(name="Chromosome", expand = c(0, 0),
@@ -111,28 +121,23 @@ drawGeneSummaryFunc <- function(pref) {
                                                                      labels=(unique(d$chr))) +
     guides(fill = guide_legend(keywidth = 3, keyheight = 1)) +
     ggtitle(sprintf("%s Intron count",pref)) + ylab("Intron Count") + theme_minimal()
-  p
+  print(p)
   
   return(summarystats)
 }
 
-
-
-pdf(sprintf("%s/%s","plots","chromwide_distributions.pdf"),onefile=TRUE,width=12)
 speciesct = length(species_list)
 print(species_list)
-
+pdf(sprintf("%s/%s","plots","chrom_features.pdf"),onefile=TRUE,width=12)
 sumstatslist = sapply(species_list$prefix,drawGeneSummaryFunc,simplify=FALSE, USE.NAMES=TRUE)
 sumstats = do.call(rbind, sumstatslist)
-pdf(sprintf("%s/%s","plots","summary_stats.pdf"),onefile=TRUE,width=12)
+pdf(sprintf("%s/%s","plots","summary_stats.pdf"),onefile=TRUE)
 
 p <- ggplot(sumstats, aes(x=intronlen_mean,y=intronct_mean,label=species,color=species)) + geom_point() + 
   theme_minimal() + ggtitle("Intron size vs occurance in genes (mean)") + scale_color_brewer(palette="Set1")
-p
+print(p)
 p <- ggplot(sumstats, aes(x=intronlen_mean,y=exonlen_mean,color=species)) + geom_point() + 
   theme_minimal() + ggtitle("Intron size vs exon size genes (mean)") + scale_color_brewer(palette="Set1")
-p
-
-dev.off()
+print(p)
 
 
