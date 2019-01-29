@@ -58,11 +58,11 @@ drawGeneSummaryFunc <- function(pref) {
   txdist
 
   ChromTxs = transcripts(txdb)
-  #gsub("_A_fumigatus\\S+","",seqnames(ChromTxs)),
-  
+  chrnames = gsub("_A_fumigatus\\S+","",seqnames(ChromTxs))
+  chrnames = gsub("scf_0+","",chrnames)
   d = data.frame(start = start(ChromTxs), 
                  end    = end(ChromTxs),
-                 chr    = seqnames(ChromTxs),
+                 chr    = chrnames,
                  strand = strand(ChromTxs),
                  txname =  ChromTxs$tx_name,
                  txid   =  ChromTxs$tx_id,
@@ -70,12 +70,19 @@ drawGeneSummaryFunc <- function(pref) {
                  length = as.numeric(width(ranges(ChromTxs)))
   )
   d <- d[order(d$chr, d$start), ]
-
-
-  intdist <- ggplot(data=d,aes(d$introncount)) + geom_histogram(binwidth=1,fill="maroon") +
+  
+  chrlens = do.call(rbind,sapply(sort(unique(d$chr)),function(i) data.frame(name=i,len=max(subset(d$end,d$chr == i))),
+                                 simplify=FALSE, USE.NAMES=TRUE))
+  topten = head(chrlens[order(-chrlens$len),],10)
+  biggest_chroms = factor(topten$name)
+  d = d[d$chr %in%  biggest_chroms, ]
+  d = droplevels(d)
+  
+  intdist <- ggplot(data=d,aes(d$introncount)) + geom_histogram(binwidth =1, fill="maroon") +
     labs(title=sprintf("%s Intron Count",pref),xlab="Intron Count") + theme_minimal()
-  intdist
-
+  print(intdist)
+  
+  
   d$index = rep.int(seq_along(unique(d$chr)), times = tapply(d$start,d$chr,length))
 
   d$pos=NA
@@ -83,12 +90,6 @@ drawGeneSummaryFunc <- function(pref) {
   lastbase=0
   ticks = NULL
   minor = vector(,8)
-  chrlens = do.call(rbind,sapply(sort(unique(d$chr)),function(i) data.frame(name=i,len=max(subset(d$end,d$chr == i))),
-                   simplify=FALSE, USE.NAMES=TRUE))
-  topten = head(chrlens[order(-chrlens$len),],10)
-  biggest_chroms = factor(topten$name)
-  d = d[d$chr %in%  biggest_chroms, ]
-  d$chr = factor(d$chr)
   nchr = length(levels(d$chr))
   for (i in 1:nchr ) {
     if (i ==1) {
@@ -106,9 +107,10 @@ drawGeneSummaryFunc <- function(pref) {
   }
   ticks <-tapply(d$pos,d$index,quantile,probs=0.5)
   minorB <- tapply(d$end,d$index,max,probs=0.5)
-  
+  # reduce the number of chroms to print to the biggest 10
+
   p <- ggplot(d,aes(x=d$pos,y=d$length, color=chr))+geom_point(alpha=0.8,size=1,shape=16) + 
-      scale_color_brewer(palette="Set2",type="seq") + scale_x_continuous(name="Chromosome", expand = c(0, 0),
+      scale_color_brewer(palette="Paired",type="seq") + scale_x_continuous(name="Chromosome", expand = c(0, 0),
                                                                          breaks = ticks,
                                                                          labels=(unique(d$chr))) +
       guides(fill = guide_legend(keywidth = 3, keyheight = 1))
@@ -116,7 +118,7 @@ drawGeneSummaryFunc <- function(pref) {
   print(p)
 
   p <- ggplot(d,aes(x=d$pos,y=d$introncount, color=chr))+geom_line(alpha=0.7,size=1) + 
-    scale_color_brewer(palette="Set2",type="seq") + scale_x_continuous(name="Chromosome", expand = c(0, 0),
+    scale_color_brewer(palette="Paired",type="seq") + scale_x_continuous(name="Chromosome", expand = c(0, 0),
                                                                        breaks = ticks,
                                                                      labels=(unique(d$chr))) +
     guides(fill = guide_legend(keywidth = 3, keyheight = 1)) +
