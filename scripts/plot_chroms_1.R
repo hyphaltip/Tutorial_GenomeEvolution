@@ -4,14 +4,14 @@ library(tximport)
 library(dplyr)
 library(pheatmap)
 library(RColorBrewer)
+library(pandas)
 
-library(GenomicFeatures)
 
 source_version = "FungiDB-41"
-species_list = read.csv("data/dna_species.dat",header=F)
+species_list = read.csv("data/dna_species.dat",header=F,stringsAsFactors = FALSE)
 colnames(species_list)=c("prefix","taxonomy")
 
-drawSummaryFunc <- function(pref) {
+drawGeneSummaryFunc <- function(pref) {
   taxonomy = sprintf("%s",species_list[species_list$prefix == pref,]$taxonomy)
   dbfile  =  sprintf("data/%s.db",pref)
   gff_file = sprintf("data/dnadb/%s.gff",pref)
@@ -39,7 +39,7 @@ drawSummaryFunc <- function(pref) {
   ilens   = unlist(ilens[any(ilens>0)],use.name=FALSE)
   ict   = unlist(lapply(width(ebg),function(i) length(i)-1),use.name=FALSE)
   intronFrame = data.frame(
-             prefix         = pref,
+             species        = pref,
              intronlen_mean = mean(ilens),
              intronlen_var  = sd(ilens),
              intronct_mean  = mean(ict),
@@ -59,8 +59,9 @@ drawSummaryFunc <- function(pref) {
                        strand = strand(ChromTxs),
                        txname =  ChromTxs$tx_name,
                        txid   =  ChromTxs$tx_id,
-                       introncount = intronct,
-                      length = width(ranges(ChromTxs)))
+                       introncount = as.numeric(intronct),
+                      length = as.numeric(width(ranges(ChromTxs)))
+  )
   d <- d[order(d$chr, d$start), ]
 
 
@@ -109,11 +110,25 @@ drawSummaryFunc <- function(pref) {
   return(intronFrame)
 }
 
+
+
 pdf(sprintf("%s/%s","plots","chrom_distributions.pdf"),onefile=TRUE,width=12)
 speciesct = length(species_list)
 print(species_list)
-intronparams <- sapply(species_list$prefix,drawSummaryFunc)
-dev.off()
 
+intronsum = sapply(species_list$prefix,drawGeneSummaryFunc,simplify=FALSE, USE.NAMES=TRUE)
+
+#intronFrame = data.frame()
+#for( i in 1:length(species_list$prefix)) {
+#   drawGeneSummaryFunc(species_list$prefix[i],intronFrame)
+#}
+
+#intronparams <- sapply(head(species_list$prefix,2),drawGeneSummaryFunc,simplify=FALSE, USE.NAMES=TRUE)
+
+
+#p <- ggplot(df.intronparams, aes(x=intronlen_mean)) + geom_bar()
+#p
+plot(df.intronparams$intronlen_mean,df.intronparams$intronct_mean)
+dev.off()
 
 
