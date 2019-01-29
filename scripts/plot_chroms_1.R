@@ -39,7 +39,7 @@ drawGeneSummaryFunc <- function(pref) {
   ilens   = unlist(ilens[any(ilens>0)],use.name=FALSE)
   ict   = unlist(lapply(width(ebg),function(i) length(i)-1),use.name=FALSE)
   
-  elens = width(ebg)
+  elens = unlist(width(ebg))
   ect   = unlist(lapply(width(ebg),function(i) length(i)),use.name=FALSE)
   summarystats = data.frame(
              species        = pref,
@@ -118,12 +118,14 @@ drawGeneSummaryFunc <- function(pref) {
 
 
 
-pdf(sprintf("%s/%s","plots","chrom_distributions.pdf"),onefile=TRUE,width=12)
+pdf(sprintf("%s/%s","plots","chromwide_distributions.pdf"),onefile=TRUE,width=12)
 speciesct = length(species_list)
 print(species_list)
 
 sumstatslist = sapply(species_list$prefix,drawGeneSummaryFunc,simplify=FALSE, USE.NAMES=TRUE)
 sumstats = do.call(rbind, sumstatslist)
+pdf(sprintf("%s/%s","plots","summary_stats.pdf"),onefile=TRUE,width=12)
+
 p <- ggplot(sumstats, aes(x=intronlen_mean,y=intronct_mean,label=species,color=species)) + geom_point() + 
   theme_minimal() + ggtitle("Intron size vs occurance in genes (mean)") + scale_color_brewer(palette="Set1")
 p
