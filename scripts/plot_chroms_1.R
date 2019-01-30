@@ -3,7 +3,6 @@ library(gridExtra)
 library(tximport)
 library(AnnotationDbi)
 library(dplyr)
-library(pheatmap) # if we do another kind of plot
 library(RColorBrewer)
 
 
