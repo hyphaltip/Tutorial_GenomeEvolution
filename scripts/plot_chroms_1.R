@@ -60,6 +60,8 @@ drawGeneSummaryFunc <- function(pref) {
   ChromTxs = transcripts(txdb)
   chrnames = gsub("_A_fumigatus\\S+","",seqnames(ChromTxs))
   chrnames = gsub("scf_0+","",chrnames)
+  chrnames = gsub("Spom972h_","",chrnames)
+  
   d = data.frame(start = start(ChromTxs), 
                  end    = end(ChromTxs),
                  chr    = chrnames,
