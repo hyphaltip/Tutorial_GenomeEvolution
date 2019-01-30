@@ -8,7 +8,7 @@ Requirements:
  - R packages “ggplot2”,”gridExtra”,”dplyr”,”RColorBrewer”
  - R/Bioconductor packages AnnotationDbi and tximport
  - install in R console with this code
- install.packages("ggplot2","gridExtra","dplyr","RColorBrewer")
+ install.packages("ggplot2","gridExtra","dplyr","RColorBrewer","pheatmap")
  if (!requireNamespace("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
 BiocManager::install("AnnotationDbi", version = "3.8")

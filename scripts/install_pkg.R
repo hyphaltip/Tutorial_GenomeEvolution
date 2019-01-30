@@ -1,4 +1,4 @@
-install.packages("ggplot2","gridExtra","dplyr","RColorBrewer")
+install.packages("ggplot2","gridExtra","dplyr","RColorBrewer","pheatmap")
 
  if (!requireNamespace("BiocManager", quietly = TRUE)) 
   install.packages("BiocManager") i
