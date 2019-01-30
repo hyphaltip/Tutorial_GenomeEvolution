@@ -2,6 +2,7 @@ library(ggplot2)
 library(gridExtra)
 library(tximport)
 library(AnnotationDbi)
+library(GenomicFeatures)
 library(dplyr)
 library(RColorBrewer)
 
