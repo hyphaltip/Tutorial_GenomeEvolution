@@ -1,7 +1,19 @@
 # Tutorial_GenomeEvolution
 Genome Evolution Lecture for Phylogenomics Workshop
 
-Framwork for learning some basic Evolutionary Genomics and Comprative steps
+Framework for learning some basic Evolutionary Genomics and Comprative steps
+
+Requirements:
+ - R
+ - R packages “ggplot2”,”gridExtra”,”dplyr”,”RColorBrewer”
+ - R/Bioconductor packages AnnotationDbi and tximport
+ - install in R console with this code
+ install.packages("ggplot2","gridExtra","dplyr","RColorBrewer")
+ if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+BiocManager::install("AnnotationDbi", version = "3.8")
+BiocManager::install("tximport", version = "3.8")
+ - or run the lines in the script scripts/install_pkg.R
 
 Data
  - there are data in the data folder and you should run  download.sh 
