@@ -5,7 +5,7 @@ Framework for learning some basic Evolutionary Genomics and Comprative steps
 
 Requirements:
  - R
- - R packages “ggplot2”,”gridExtra”,”dplyr”,”RColorBrewer”
+ - R packages “ggplot2”,”gridExtra”,”dplyr”,”RColorBrewer”, "pheatmap"
  - R/Bioconductor packages AnnotationDbi and tximport
  - install in R console with this code
  install.packages("ggplot2","gridExtra","dplyr","RColorBrewer","pheatmap")
@@ -23,7 +23,7 @@ Data
    of folders which list the strain eg Umaydis521 not Umaydis which is where the genome data are located.
 
  - pre-run OrthoFinder results are in analysis/ortho_set1/Results
-    see the Orthologs.csv and Orthogroups.GeneCount.csv for orthologs contain
+    see the Orthogroups.csv and Orthogroups.GeneCount.csv for orthologs contain
     See the Orthogroups_UnassignedGenes.csv for genes which are not in a cluster
 
 scripts 
