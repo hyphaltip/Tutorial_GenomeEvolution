@@ -145,3 +145,4 @@ p <- ggplot(sumstats, aes(x=intronlen_mean,y=exonlen_mean,color=species)) + geom
 print(p)
 
 
+dev.off()
